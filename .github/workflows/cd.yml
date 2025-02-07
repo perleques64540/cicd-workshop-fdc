@@ -26,35 +26,33 @@ jobs:
           - name: Configure GCP Project
             run: gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
 
+          # CI steps
+          - name: Setup Flutter 
+            uses: subosito/flutter-action@v2
+            with:
+              channel: 'stable'
 
-          - name: Setup Flutter
-            run: flutter build web
-            run: flutter pub get
-            run: flutter build web
-            run: dart format --output=none --set-exit-if-changed .
-            run: flutter analyze
-            run: flutter test
-
+          - run: flutter pub get
+          - run: flutter build web
+          - run: dart format --output=none --set-exit-if-changed .
+          - run: flutter analyze
+          - run: flutter test
 
           # Configure Docker authentication for interacting with Artifact Registry, allowing you to push or pull Docker images securely.
           # Build the docker image and push top artifact registry.
-           - name: Build and Push Docker Image 🐳
-             run: |
-               gcloud auth configure-docker --quiet
-               gcloud auth configure-docker europe-west3-docker.pkg.dev --quiet
+          - name: Build and Push Docker Image 🐳 
+            run: |
+              gcloud auth configure-docker --quiet
+              gcloud auth configure-docker europe-west3-docker.pkg.dev --quiet
 
-              docker build -t europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY }}/MY_FIRST_TEST:v0 .
-              docker push europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY }}/MY_FIRST_TEST:v0
+              docker build -t europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY }}/flutter-web-app:v1 .
+              docker push europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY }}/flutter-web-app:v1
 
-
-          # Deploy the docker image to Cloud Run
           - name: Deploy to Cloud Run ☁️
             run: |
               gcloud run deploy cicd-13 \
-                --image europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY }}/MY_FIRST_TEST:v0 \
-                --region us-central
+                        --image europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY }}/flutter-web-app:v1 \
+                        --region us-central1 \
 
           - name: This will be your CD ⚙️
             run: echo "This will be your CD ⚙️"
-
-
