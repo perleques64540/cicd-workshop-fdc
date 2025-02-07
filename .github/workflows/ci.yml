@@ -20,7 +20,7 @@ jobs:
         with:
           channel: "stable"
 
-      - name: Run unit test
+      - name: Run unit test 2
       - run: flutter pub get
       - run: flutter build web
       - run: dart format --output=none --set-exit-if-changed .
