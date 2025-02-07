@@ -34,7 +34,7 @@ class WinGameScreen extends StatelessWidget {
             gap,
             const Center(
               child: Text(
-                'You did it!',
+                'You did it! CD/CI is working!',
                 style: TextStyle(fontFamily: 'Permanent Marker', fontSize: 50),
               ),
             ),
